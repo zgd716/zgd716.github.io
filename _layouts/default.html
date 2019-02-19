@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="{{ site.lang | default: "en-US" }}">
-
+  <script src="{{ site.baseurl }}/assets/js/jquery-1.12.4.min.js"></script>
   {% include head.html %}
 
 <body>
@@ -24,7 +24,7 @@
     {% endif %} -->
 
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
-    <script src="{{ site.baseurl }}/assets/js/jquery-1.12.4.min.js"></script>
+    
     <!-- Include all compiled plugins (below), or include individual files as needed -->
     <script src="{{ site.baseurl }}/assets/bootstrap-3.3.7-dist/js/bootstrap.min.js"></script>
     <!-- TOC -->
@@ -32,7 +32,7 @@
 
     <script>$("#search-form").submit(function(event){
       var query = document.getElementById("search-input").value;
-      window.open("http://google.com/search?q=" + query + "%20site:" + "{{ site.sitesearchurl}}");
+      window.open("https://google.com/search?q="+query+"%20site:" + "{{ site.sitesearchurl}}");
     });</script>
   </body>
 </html>
