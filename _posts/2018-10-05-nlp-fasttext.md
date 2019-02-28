@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  "fasttext 文本分类"
-date: 2019-02-15 05:30:00
+date: 2018-10-05 05:30:00
 categories: nlp
 tags: [fasttext,文本分类]
 ---
