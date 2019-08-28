@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <script src="/assets/js/jquery-1.12.4.min.js"></script>
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+  <title>
+    
+      rasa（task bot） &middot; 虚无-jellyzhang
+    
+  </title>
+
+  <!-- Bootstrap -->
+  <link rel="stylesheet" href="/assets/bootstrap-3.3.7-dist/css/bootstrap.min.css">
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="/assets/font-awesome/css/font-awesome.min.css">
+  <!-- My CSS -->
+  <link rel="stylesheet" href="/assets/main.css">
+
+  <!-- MathJax -->
+  <script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      TeX: {
+        equationNumbers: {
+          autoNumber: "AMS"
+        }
+      },
+      tex2jax: {
+        inlineMath: [ ['$','$'] ],
+        displayMath: [ ['$$','$$'] ],
+        processEscapes: true,
+      }
+    });
+  </script>
+  
+
+  <!-- code highlighting-->
+  <link rel="stylesheet" href="/lib/highlight/styles/hybrid.css">
+  <script src="/lib/highlight/highlight.pack.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script>
+  <script>hljs.configure({ ignore: ['text'] });</script>
+  
+  <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+  <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+  <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+    <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+  <![endif]-->
+</head>
+
+<body>
+    <header class="header">
+  <!-- Navigation -->
+  <nav class="navbar navbar-default .navbar-static-top">
+    <div class="container">
+      <!-- Brand and toggle get grouped for better mobile display -->
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+          <span class="sr-only">Toggle navigation</span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="/" style="color:#333">虚无-jellyzhang</a>
+        <p class="navbar-text"></p>
+      </div>
+
+      <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+        <ul class="nav navbar-nav navbar-right">
+        
+          <li>
+            <a href="/archives.html">归档</a>
+          </li>
+          <li>
+            <a href="/categories.html">分类</a>
+          </li>
+          <li>
+            <a href="/tags.html">标签</a>
+          </li>
+          <li>
+            <a href="/about.html">关于</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+</header>
+
+  
+    <div class="container">
+  <div class="row-fluid main">
+    <div class="col-md-9 content">
+      <article class="post">
+        <h1 class="post-title">rasa（task bot）</h1>
+
+        <div class="post-info">
+          <span class="post-date">20 Aug 2019</span>
+           | 
+            <span class="fa fa-folder-open" aria-hidden="true">
+            
+              <a class="post-categories" href="/categories.html#nlp">nlp</a>
+            
+            </span>
+          
+           | 
+            <span class="fa fa-tag" aria-hidden="true">
+            
+              <a class="post-tags" href="/tags.html#nlp">nlp</a>
+            
+              <a class="post-tags" href="/tags.html#rasa">rasa</a>
+            
+            </span>
+          
+        </div>
+
+        <hr>
+        <div class="post-content">
+          <!-- 数学公式 -->
+<script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript"></script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    tex2jax: {
+      skipTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
+      inlineMath: [['$','$']]
+    }
+  });
+</script>
+
+<p>所谓对话系统，是通过对话的方式，实现人机交互的一种方法。</p>
+
+<p>Rasa是一家通过机器学习技术实现对话系统、机器人开发的工具，同时也是一家创业公司。<!-- more --></p>
+
+<h2 id="rasa的组成">Rasa的组成</h2>
+
+<h3 id="rasa-nlu">Rasa NLU</h3>
+
+<p>主要实现自然语言理解（即NLU）功能，本质上就是识别句子的意图和实体。</p>
+
+<p>如“买一张去北京的票”，我们可以定义一个意图是“购票”，实体是“北京”和“一张”。</p>
+
+<p>意图识别本质是短文本分类任务（当然在学术界可能称为Intent Detection来和Text Classification分开）。单纯短文本分类任务的SOTA基本上就是BERT了。</p>
+
+<p>抽取本质是信息抽取任务。抽取的SOTA现在一般还是BiLSTM-CRF的各种变型，或BERT之类。</p>
+
+<p>现在学术界的主要研究方向是多种工作结合，例如同一模型同时做意图识别和信息抽取，互相配合增加总体准确率。</p>
+
+<p>Rasa的NLU，主要是当前的社区版，主要还是使用了各种开源技术，并没有追求学术上的SOTA。它使用的工具包括Spacy、sklearn-crfsuite</p>
+
+<h3 id="rasa-core">Rasa Core</h3>
+
+<p>这是Rasa的核心部分，NLU有各种实现，开源的也有snips nlu等，但是core却独一无二。</p>
+
+<p>Rasa Core主要完成了基于故事的对话管理，包括解析故事并生成对话系统中的对话管理模型（Dialog Management），输出系统决策（System Action/System Policy）。</p>
+
+<p>学术上一般认为这部分会包含两个模型</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>1、对话状态跟踪（Dialog State Tracking / Belief Tracking）
+
+2、对话策略（Dialog Policy / Policy Optimization）
+</code></pre></div></div>
+
+<p>对于1.其实Rasa实现很简单，具体在它的论文 Few-Shot Generalization Across Dialogue Tasks, Vlasov et at., 2018 中说的比较具体。就是简单的基于策略的槽状态替换。</p>
+
+<p>对于2.Rasa使用基于LSTM的Learn to Rank方法，大体上是将当前轮用户意图、上一轮系统行为、当前槽值状态向量化，然后与所有系统行为做相似度学习，以此决定当前轮次的一个或多个系统行为</p>
+
+<h3 id="rasa--的-pipeline">Rasa  的 Pipeline</h3>
+
+<p>Pipeline 的过程是这样的：</p>
+
+<p><img src="../imgs/rasa/rasa-pipeline.jpg" width="650" /></p>
+
+<p>1、用户输入文字，送入解释器，即Rasa NLU</p>
+
+<p>2、NLU给出结果，如图</p>
+
+<p><img src="../imgs/rasa/nlu.jpg" width="650" /></p>
+
+<p>3、从Tracker到Policy，Tracker用于跟踪对话状态，Tracker输出的是Embedding</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>用户意图的Embedding
+
+系统动作（上一步）的Embedding
+
+实体（槽值/Slot）的Embedding
+</code></pre></div></div>
+
+<p>4、Policy给出系统行为</p>
+
+<p>5、Tracker记录系统行为，下一次会提供给Policy使用</p>
+
+<p>6、返回消息给用户</p>
+
+        </div>
+        <br><br>
+      </article>
+
+      <nav class="post-pagination">
+        
+        <a href="/nlp/nlp-bert.html" class="btn previous" title="bert">&larr; bert</a>
+        
+        
+        <a href="/nlp/cluster.html" class="btn next" title="聚类">聚类 &rarr;</a>
+        
+      </nav>
+
+      <hr>
+
+      
+      <aside class="related">
+        <h3>Related Posts</h3>
+        <ul class="related-posts">
+          
+            <li>
+              <a href="/nlp/cluster.html">
+                聚类
+                <small><time datetime="2019-08-26T18:30:00+08:00">26 Aug 2019</time></small>
+              </a>
+            </li>
+          
+            <li>
+              <a href="/nlp/nlp-bert.html">
+                bert
+                <small><time datetime="2019-02-28T18:30:00+08:00">28 Feb 2019</time></small>
+              </a>
+            </li>
+          
+            <li>
+              <a href="/nlp/nlp-transformer.html">
+                transformer
+                <small><time datetime="2019-02-12T18:30:00+08:00">12 Feb 2019</time></small>
+              </a>
+            </li>
+          
+        </ul>
+      </aside>
+      
+
+      <!-- Gitment -->
+<div id="container"></div>
+<link rel="stylesheet" href="https://imsun.github.io/gitment/style/default.css">
+<script src="https://imsun.github.io/gitment/dist/gitment.browser.js"></script>
+<script>
+var gitment = new Gitment({
+  id: '页面 ID', // 可选。默认为 location.href
+  owner: 'zgd716',
+  repo: 'zgd716.github.io',
+  oauth: {
+    client_id: 'f2929ac3ac85d885f3ac',
+    client_secret: 'bed8d991d79eb65d3d4d5437eecd2af1ea6b1fd9',
+  },
+})
+gitment.render('container')
+</script>
+    </div>
+    
+    <div class="col-md-3 post-sidebar">
+      <div class="sidebar-content" id="sidebar">
+  <nav class="header-list-sidebar">
+    <ul id="sideNav" class="nav headers-sidenav">
+        <!-- code will be generated in TOC.js -->
+    </ul>
+  </nav>
+</div>
+    </div>
+  </div>
+</div>
+
+
+     
+
+<div class="cb-search-tool" style="position: fixed; top: 0px ; bottom: 0px; left: 0px; right:  0px;
+      opacity: 0.95; background-color: #111111; z-index: 9999; display: none;">
+    <input type="text" class="form-control cb-search-content" id="cb-search-content" style="position: fixed; top: 60px" placeholder="文章标题 日期 标签" >
+
+    <div style="position: fixed; top: 16px; right: 16px;">
+        <img src="/search/img/cb-close.png"  id="cb-close-btn"/>
+    </div>
+</div>
+
+<div style="position: fixed; right: 16px; bottom: 70px;">
+    <img src="/search/img/cb-search.png"  id="cb-search-btn"  title="双击ctrl试一下"/>
+</div>
+
+<link rel="stylesheet" href="/search/css/cb-search.css">
+
+<script src="/search/js/bootstrap3-typeahead.min.js"></script>
+<script src="/search/js/cb-search.js"></script>
+
+
+    <a href="#top" class="back-to-top">^</a>
+
+<!--      -->
+
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="/assets/bootstrap-3.3.7-dist/js/bootstrap.min.js"></script>
+    <!-- TOC -->
+    <script src="/assets/js/toc/TOC.js"></script>
+
+    <script>$("#search-form").submit(function(event){
+      var query = document.getElementById("search-input").value;
+      window.open("https://google.com/search?q="+query+"%20site:" + "zgd716.github.io");
+    });</script>
+  </body>
+</html>

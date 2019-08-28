@@ -25,6 +25,8 @@ baseurl: "" # the subpath of your site, e.g. /blog
 # Markdown Processors
 markdown: kramdown
 
+
+
 plugins:
   - jekyll-paginate
 paginate: 5

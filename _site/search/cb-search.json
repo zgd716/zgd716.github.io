@@ -1,0 +1,60 @@
+{
+	"code" : 0 ,
+	"data" : [
+	 
+	{
+		"title" : "聚类 - nlp_cluster",
+		"url" : "/nlp/cluster.html"
+	}
+	
+	,
+	
+    
+	{
+		"title" : "rasa（task bot） - nlp_rasa",
+		"url" : "/nlp/nlp-rasa.html"
+	}
+	
+	,
+	
+    
+	{
+		"title" : "bert - nlp_bert",
+		"url" : "/nlp/nlp-bert.html"
+	}
+	
+	,
+	
+    
+	{
+		"title" : "transformer - nlp_transformer_attention",
+		"url" : "/nlp/nlp-transformer.html"
+	}
+	
+	,
+	
+    
+	{
+		"title" : "tensorflow模型+flask+nginx+uwsgi+docker部署 - docker_tensorflow_flask_nginx_uwsgi_docker",
+		"url" : "/deployment/deployment-tfmodel_1.html"
+	}
+	
+	,
+	
+    
+	{
+		"title" : "Deep contextualized word representations(ELMO) - word representations",
+		"url" : "/nlp/nlp-elmo.html"
+	}
+	
+	,
+	
+    
+	{
+		"title" : "fasttext 文本分类 - fasttext_文本分类",
+		"url" : "/nlp/nlp-fasttext.html"
+	}
+	
+    
+	]
+}

@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <script src="/assets/js/jquery-1.12.4.min.js"></script>
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+  <title>
+    
+      Deep contextualized word representations(ELMO) &middot; 虚无-jellyzhang
+    
+  </title>
+
+  <!-- Bootstrap -->
+  <link rel="stylesheet" href="/assets/bootstrap-3.3.7-dist/css/bootstrap.min.css">
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="/assets/font-awesome/css/font-awesome.min.css">
+  <!-- My CSS -->
+  <link rel="stylesheet" href="/assets/main.css">
+
+  <!-- MathJax -->
+  <script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      TeX: {
+        equationNumbers: {
+          autoNumber: "AMS"
+        }
+      },
+      tex2jax: {
+        inlineMath: [ ['$','$'] ],
+        displayMath: [ ['$$','$$'] ],
+        processEscapes: true,
+      }
+    });
+  </script>
+  
+
+  <!-- code highlighting-->
+  <link rel="stylesheet" href="/lib/highlight/styles/hybrid.css">
+  <script src="/lib/highlight/highlight.pack.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script>
+  <script>hljs.configure({ ignore: ['text'] });</script>
+  
+  <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+  <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+  <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+    <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+  <![endif]-->
+</head>
+
+<body>
+    <header class="header">
+  <!-- Navigation -->
+  <nav class="navbar navbar-default .navbar-static-top">
+    <div class="container">
+      <!-- Brand and toggle get grouped for better mobile display -->
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+          <span class="sr-only">Toggle navigation</span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="/" style="color:#333">虚无-jellyzhang</a>
+        <p class="navbar-text"></p>
+      </div>
+
+      <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+        <ul class="nav navbar-nav navbar-right">
+        
+          <li>
+            <a href="/archives.html">归档</a>
+          </li>
+          <li>
+            <a href="/categories.html">分类</a>
+          </li>
+          <li>
+            <a href="/tags.html">标签</a>
+          </li>
+          <li>
+            <a href="/about.html">关于</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+</header>
+
+  
+    <div class="container">
+  <div class="row-fluid main">
+    <div class="col-md-9 content">
+      <article class="post">
+        <h1 class="post-title">Deep contextualized word representations(ELMO)</h1>
+
+        <div class="post-info">
+          <span class="post-date">15 Dec 2018</span>
+           | 
+            <span class="fa fa-folder-open" aria-hidden="true">
+            
+              <a class="post-categories" href="/categories.html#nlp">nlp</a>
+            
+            </span>
+          
+           | 
+            <span class="fa fa-tag" aria-hidden="true">
+            
+              <a class="post-tags" href="/tags.html#word representations">word representations</a>
+            
+            </span>
+          
+        </div>
+
+        <hr>
+        <div class="post-content">
+          <!-- 数学公式 -->
+<script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript"></script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    tex2jax: {
+      skipTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
+      inlineMath: [['$','$']]
+    }
+  });
+</script>
+
+<p>近年来，研究人员通过文本上下文信息分析获得更好的词向量。ELMo是其中的翘楚，在多个任务、多个数据集上都有显著的提升。所以，它是目前最好用的词向量，the-state-of-the-art的方法。这篇文章发表在2018年的NAACL上，outstanding paper award下面就简单介绍一下这个“神秘”的词向量模型。<!-- more --></p>
+
+<h2 id="1introduction">1、Introduction</h2>
+
+<ul>
+  <li>
+    <p><strong>什么是一个好的词向量</strong></p>
+
+    <ul>
+      <li>
+        <p>能够反映出语义和语法的复杂特征.</p>
+      </li>
+      <li>
+        <p>能够准确的对不同上下文进行反应.</p>
+      </li>
+    </ul>
+  </li>
+  <li>
+    <p><strong>deep contextualized 词向量的特点</strong></p>
+    <ul>
+      <li><strong>使用理念方面:</strong>
+        <ul>
+          <li>在原先的词向量模型中, 每个词对应着一个向量, 但是这个模型是根据一个句子赋予每个词汇向量. 因此对于一个n-tokens的输入NLP任务模型, 输入到NLP任务模型的是n个向量. 这个论文中提出的方法, 是在NLP模型的输入之前需要再加一个动态计算词向量的前向网络, 我们称其为BiLMs, 而这个前向网络是提前在一个大的数据集上训练好的. 而这个前向网络的输入是n个更初始的词向量.</li>
+        </ul>
+      </li>
+      <li><strong>训练具体信息</strong>:
+        <ul>
+          <li>简单来说是一个多层的双向LSTMs结构, 称其为BiLMs模型.</li>
+        </ul>
+      </li>
+      <li><strong>效果方面:</strong>
+        <ul>
+          <li>BiLMs的较高层次的隐藏单元的向量很好的抓住了词汇的意义表示, 并且在很多任务上不用再次对词向量进行调整就可以得到一个不错的结果.</li>
+          <li>BiLMs的较低层次的隐藏单元的向量很好的抓住了词汇的语法信息, 可以在例如词性标注的任务上发挥其作用.</li>
+          <li>这种深度模型所带来的分层效果使得将一套词向量应用于不同任务有了可能性. 因为, 每个任务所需要的信息多是不同的.在六个任务上进行了测试,都发现好于最佳结果.</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+</ul>
+
+<h2 id="2elmo-embeddings-from-language-models">2、ELMo: Embeddings from Language Models</h2>
+
+<h3 id="21-bidirectional-language-model">2.1 Bidirectional language model</h3>
+
+<p>语言模型就是生成文本的方式、方法，是多个N个词语的序列（t<sub>1</sub>, t<sub>2</sub>,…,t<sub>N</sub>)的极大似然。</p>
+
+<!-- 最近，如《Exploring the limits of language modeling》、《On the state of the art of evaluation in neural language models》和《Regularizing and optimizing lstm language models》等论文
+中，首先使用character-level的RNN或CNN，计算得到“上下文无关”（context-independent）词向量表示
+<img src="http://chart.googleapis.com/chart?cht=tx&chl=$${x_{k}}^{LM}$$" style="border:none;">，然后将此向量feed进入L层的前向LSTM。在每一个位置k ，每个LSTM层会输出一个
+<img src="http://chart.googleapis.com/chart?cht=tx&chl=\vec{h}_{k,j}^{LM}" style="border:none;">，其中j=1,....L. 最顶层的LSTM输出为
+<img src="http://chart.googleapis.com/chart?cht=tx&chl=\vec{h}_{k,L}^{LM}" style="border:none;">
+  ，然后加上softmax来预测下一个词语 t<sub>k+1</sub> 。 -->
+
+<p>前向语言模型就是，已知（t<sub>1</sub>, t<sub>2</sub>,…,t<sub>k-1</sub>)，预测下一个词语t<sub>k</sub>的概率，写成公式就是</p>
+
+<p><img src="http://chart.googleapis.com/chart?cht=tx&amp;chl=$$p(t_1,t_2,...,t_N)=\prod_{k=1}^{N}p(t_k|t_1,t_2,...,t_{k-1})$$" style="border:none;" /></p>
+
+<p>既然是双向，后向的语言模型如下，即通过下文预测之前的词语：</p>
+
+<p><img src="http://chart.googleapis.com/chart?cht=tx&amp;chl=$$p(t_1,t_2,...,t_N)=\prod_{k=1}^{N}p(t_k|t_{k%2B1},t_{k%2B2},...,t_N)$$" style="border:none;" /></p>
+
+<p>双向语言模型（biLM）将前后向语言模型结合起来，最大化前向、后向模型的联合似然函数即可，如下式所示：</p>
+
+<p><img src="http://chart.googleapis.com/chart?cht=tx&amp;chl=$$\sum_{k=1}^{N}{\left(logp(t_k|t_1,t_2...t_{k-1};Q_x,\underset{Q_{LSTM}}{\rightarrow},Q_s)%2Blogp(t_k|t_{k%2B1},t_{k%2B2}...t_{N};Q_x,\underset{Q_{LSTM}}{\leftarrow},Q_s)\right)}$$" style="border:none;" /></p>
+
+<p>其中Q<sub>x</sub> 和 Q<sub>s</sub>分别是context-independent词向量训练时和softmax层的参数,他们是相同的，<img src="http://chart.googleapis.com/chart?cht=tx&amp;chl=\underset{Q_{LSTM}}{\rightarrow}" style="border:none;" />和 
+<img src="http://chart.googleapis.com/chart?cht=tx&amp;chl=\underset{Q_{LSTM}}{\leftarrow}" style="border:none;" />则是双向语言模型的（前后向语言模型的）参数。单层双向lstm如下：
+<img src="/imgs/elmo/elmo_bilstm.jpg" /></p>
+
+<p><br />
+那么, 这里设定第 j 层的第 k 个位置的forward LSTM(也就是右向LSTM)输出为<img src="http://chart.googleapis.com/chart?cht=tx&amp;chl=\underset{h_{k,j}^{LM}}{\rightarrow}" style="border:none;" /></p>
+
+<p>那么, 左向就是<img src="http://chart.googleapis.com/chart?cht=tx&amp;chl=\underset{h_{k,j}^{LM}}{\leftarrow}" style="border:none;" /></p>
+
+<p>Input, 也就是最原始的词向量为<img src="http://chart.googleapis.com/chart?cht=tx&amp;chl=$${x_{k}}^{LM}$$" style="border:none;" /></p>
+
+<p>那么, 这个最原始的词向量是怎么获得的呢?前面提到了, 是通过字符卷积, 大概是这个样子:</p>
+
+<div align="center"><img src="/imgs/elmo/elmo_embedding_network.jpg" style="align:center" /></div>
+
+<h3 id="22-elmo">2.2 Elmo</h3>
+
+<p>上面说到了, LSTM的每一层都有自己不同的代表的意义, 因此,对于不同的任务, 每层参与表征的权重也就不同, 因此, 为了一般化, 该方案设置一个通用词向量表征法, 即利用每层状态的线性组合.</p>
+
+<p><img src="/imgs/elmo/elmo_rep.jpg" /></p>
+
+<p>这是线性组合的单元集合.</p>
+
+<p><img src="/imgs/elmo/elmo_elmo.jpg" /></p>
+
+<p>其中,s就是softmax-normalized weights , 也就是加和为1的一组权重向量. 这组权重不仅仅代表的是权重, 因为每层LSTM内部状态,也就是 h 的分布是不同的, 这个也可以用作layer normalization.</p>
+
+<p><img src="http://chart.googleapis.com/chart?cht=tx&amp;chl=\gamma" style="border:none;" /> 允许具体的task模型去放缩 ELMo 的大小. 这个地方非常重要, 作者在补充中进行了强调, 在没有这个的情况下, 只采用该模型的最后一层输出作为词向量的时候的效果甚至差于 baseline. 这个重要的原因是, BiLM的内部表征和具体任务的表征的分布是不一样的.</p>
+
+<h3 id="23-using-bilms-for-supervised-nlp-tasks">2.3 Using biLMs for supervised NLP tasks</h3>
+
+<ul>
+  <li>
+    <p><strong>最简版使用方法</strong></p>
+
+    <p>将该词向量加到一般的任务的方法是, 先固定一个权重, 构成一个 $ELMO_t^{task}$ ​ , 然后联结 ​ $ELMO_t^{task}$ 和 最初始词向量(也就是通过字符卷积获得的向量) 为 [​ $x_k$;$ELMO_t^{task}$], 然后将这个向量输入到任务的RNN模型中去. 然后在训练中一同训练权重因子.</p>
+  </li>
+  <li>
+    <p><strong>加强版</strong></p>
+
+    <p>我们可以在output处也加一个这样的向量,即 ​ $[h_k;ELMO_t^{task}]$ , 不同是,这里应该采用与输入 $ELMO_t^{task}$ 中不同的权重因子.</p>
+  </li>
+  <li>
+    <p><strong>终极版</strong></p>
+
+    <p>可以在ELMo模型中加入dropout, 以及采用 L2 loss的方法来提升模型.
+  并且, 这里的 L2 项的系数 ​ $\lambda$ 越大, 越有取各层平均值的意思, 越小, 越可以发挥各个层之间的不同带来的效果. 但是并不是说, 越小越好</p>
+  </li>
+</ul>
+
+<h3 id="24-pre-trained-bidirectional-language-model-architecture">2.4 Pre-trained bidirectional language model architecture</h3>
+
+<p>现在进入真正重要的部分, 也就是如何训练这个 ELMo 网络的问题.</p>
+
+<ul>
+  <li>
+    <p><strong>模型结构</strong></p>
+
+    <p>这里采用的还是语言模型去训练网络. 并且这篇的模型是有借鉴先行研究的.</p>
+
+    <p>Exploring the limits of language modeling.</p>
+
+    <p>Character-Aware Neural Language Models</p>
+
+    <p>这两个先行研究都是基于字符卷积网络来做的, 但是这其中有一个问题是字符卷积网络的低效问题, 详细见论文. 通过这篇论文我们也知道, 能够实现最大效率利用字符共现来表达词义的网络就是biLSTMs 网络, 这也是为什么这个模型采用这个网络的原因.</p>
+
+    <p>但是不同于这两个论文的是, 这个论文增加了</p>
+
+    <ul>
+      <li>
+        <p>使得模型可以同时训练双向参数的</p>
+      </li>
+      <li>
+        <p>增加 LSTMs单元之间的残差连接(残差网络). 简单说, 就是一种简化训练,提升在深层网络下训练效率的方法.</p>
+      </li>
+    </ul>
+
+    <p>并且, 这里使用的是 CNN-BIG-LSTM , 也就是说模型的 size 特别大. 这个主要是从 Exploring the limits of language modeling 中学得的.</p>
+  </li>
+  <li>
+    <p><strong>模型参数</strong></p>
+
+    <p>最终的模型参数如下, 这些参数的示意都在 (Exploring the limits of language modeling) 这篇文章中,由于篇幅较长, 见最后的补充部分.</p>
+
+    <ul>
+      <li>
+        <p>是一个两层的LSTM, 每层的LSTM cell拥有4096个单元(即hidden state) 和512维度映射</p>
+      </li>
+      <li>
+        <p>从第一层到第二层存在一个残差连接</p>
+      </li>
+      <li>
+        <p>context insensitive type representation uses 2048 character n-gram convolutional filters followed by two highway layers. 也就是说使用了2048个过滤器, 来进行基于字符的卷积计算.</p>
+      </li>
+      <li>
+        <p>a linear projection down to a 512 representation. 也就是一直在说的各层输出的线性组合.</p>
+      </li>
+    </ul>
+
+    <p>最后的结果是, 整个模型针对一个token, 可以产生三个向量, 原始 , 第一层以及第二层.</p>
+  </li>
+</ul>
+
+<h3 id="25-evaluation">2.5 Evaluation</h3>
+
+<p>论文从 Question answering, Textual entailment, Semantic role labeling, Coreference resolution, Named entity extraction, Sentiment analysis 六个人物来验证, 都取得了提升.</p>
+
+<h2 id="3-supplementary">3、 Supplementary</h2>
+
+<p>这里主要补充被该论文一概而过, 但是又极其重要的部分.主要基于两篇论文:Character-Aware Neural Language Models 和 Exploring the Limits of Language Modeling，具体可查看论文</p>
+
+
+        </div>
+        <br><br>
+      </article>
+
+      <nav class="post-pagination">
+        
+        <a href="/nlp/nlp-fasttext.html" class="btn previous" title="fasttext 文本分类">&larr; fasttext 文本分类</a>
+        
+        
+        <a href="/deployment/deployment-tfmodel_1.html" class="btn next" title="tensorflow模型+flask+nginx+uwsgi+docker部署">tensorflow模型+flask+nginx+uwsgi+docker部署 &rarr;</a>
+        
+      </nav>
+
+      <hr>
+
+      
+      <aside class="related">
+        <h3>Related Posts</h3>
+        <ul class="related-posts">
+          
+            <li>
+              <a href="/nlp/cluster.html">
+                聚类
+                <small><time datetime="2019-08-26T18:30:00+08:00">26 Aug 2019</time></small>
+              </a>
+            </li>
+          
+            <li>
+              <a href="/nlp/nlp-rasa.html">
+                rasa（task bot）
+                <small><time datetime="2019-08-20T18:30:00+08:00">20 Aug 2019</time></small>
+              </a>
+            </li>
+          
+            <li>
+              <a href="/nlp/nlp-bert.html">
+                bert
+                <small><time datetime="2019-02-28T18:30:00+08:00">28 Feb 2019</time></small>
+              </a>
+            </li>
+          
+        </ul>
+      </aside>
+      
+
+      <!-- Gitment -->
+<div id="container"></div>
+<link rel="stylesheet" href="https://imsun.github.io/gitment/style/default.css">
+<script src="https://imsun.github.io/gitment/dist/gitment.browser.js"></script>
+<script>
+var gitment = new Gitment({
+  id: '页面 ID', // 可选。默认为 location.href
+  owner: 'zgd716',
+  repo: 'zgd716.github.io',
+  oauth: {
+    client_id: 'f2929ac3ac85d885f3ac',
+    client_secret: 'bed8d991d79eb65d3d4d5437eecd2af1ea6b1fd9',
+  },
+})
+gitment.render('container')
+</script>
+    </div>
+    
+    <div class="col-md-3 post-sidebar">
+      <div class="sidebar-content" id="sidebar">
+  <nav class="header-list-sidebar">
+    <ul id="sideNav" class="nav headers-sidenav">
+        <!-- code will be generated in TOC.js -->
+    </ul>
+  </nav>
+</div>
+    </div>
+  </div>
+</div>
+
+
+     
+
+<div class="cb-search-tool" style="position: fixed; top: 0px ; bottom: 0px; left: 0px; right:  0px;
+      opacity: 0.95; background-color: #111111; z-index: 9999; display: none;">
+    <input type="text" class="form-control cb-search-content" id="cb-search-content" style="position: fixed; top: 60px" placeholder="文章标题 日期 标签" >
+
+    <div style="position: fixed; top: 16px; right: 16px;">
+        <img src="/search/img/cb-close.png"  id="cb-close-btn"/>
+    </div>
+</div>
+
+<div style="position: fixed; right: 16px; bottom: 70px;">
+    <img src="/search/img/cb-search.png"  id="cb-search-btn"  title="双击ctrl试一下"/>
+</div>
+
+<link rel="stylesheet" href="/search/css/cb-search.css">
+
+<script src="/search/js/bootstrap3-typeahead.min.js"></script>
+<script src="/search/js/cb-search.js"></script>
+
+
+    <a href="#top" class="back-to-top">^</a>
+
+<!--      -->
+
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="/assets/bootstrap-3.3.7-dist/js/bootstrap.min.js"></script>
+    <!-- TOC -->
+    <script src="/assets/js/toc/TOC.js"></script>
+
+    <script>$("#search-form").submit(function(event){
+      var query = document.getElementById("search-input").value;
+      window.open("https://google.com/search?q="+query+"%20site:" + "zgd716.github.io");
+    });</script>
+  </body>
+</html>

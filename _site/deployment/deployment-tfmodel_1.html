@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <script src="/assets/js/jquery-1.12.4.min.js"></script>
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+  <title>
+    
+      tensorflow模型+flask+nginx+uwsgi+docker部署 &middot; 虚无-jellyzhang
+    
+  </title>
+
+  <!-- Bootstrap -->
+  <link rel="stylesheet" href="/assets/bootstrap-3.3.7-dist/css/bootstrap.min.css">
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="/assets/font-awesome/css/font-awesome.min.css">
+  <!-- My CSS -->
+  <link rel="stylesheet" href="/assets/main.css">
+
+  <!-- MathJax -->
+  <script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      TeX: {
+        equationNumbers: {
+          autoNumber: "AMS"
+        }
+      },
+      tex2jax: {
+        inlineMath: [ ['$','$'] ],
+        displayMath: [ ['$$','$$'] ],
+        processEscapes: true,
+      }
+    });
+  </script>
+  
+
+  <!-- code highlighting-->
+  <link rel="stylesheet" href="/lib/highlight/styles/hybrid.css">
+  <script src="/lib/highlight/highlight.pack.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script>
+  <script>hljs.configure({ ignore: ['text'] });</script>
+  
+  <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+  <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+  <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+    <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+  <![endif]-->
+</head>
+
+<body>
+    <header class="header">
+  <!-- Navigation -->
+  <nav class="navbar navbar-default .navbar-static-top">
+    <div class="container">
+      <!-- Brand and toggle get grouped for better mobile display -->
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+          <span class="sr-only">Toggle navigation</span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="/" style="color:#333">虚无-jellyzhang</a>
+        <p class="navbar-text"></p>
+      </div>
+
+      <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+        <ul class="nav navbar-nav navbar-right">
+        
+          <li>
+            <a href="/archives.html">归档</a>
+          </li>
+          <li>
+            <a href="/categories.html">分类</a>
+          </li>
+          <li>
+            <a href="/tags.html">标签</a>
+          </li>
+          <li>
+            <a href="/about.html">关于</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+</header>
+
+  
+    <div class="container">
+  <div class="row-fluid main">
+    <div class="col-md-9 content">
+      <article class="post">
+        <h1 class="post-title">tensorflow模型+flask+nginx+uwsgi+docker部署</h1>
+
+        <div class="post-info">
+          <span class="post-date">20 Jan 2019</span>
+           | 
+            <span class="fa fa-folder-open" aria-hidden="true">
+            
+              <a class="post-categories" href="/categories.html#deployment">deployment</a>
+            
+            </span>
+          
+           | 
+            <span class="fa fa-tag" aria-hidden="true">
+            
+              <a class="post-tags" href="/tags.html#docker">docker</a>
+            
+              <a class="post-tags" href="/tags.html#tensorflow">tensorflow</a>
+            
+              <a class="post-tags" href="/tags.html#flask">flask</a>
+            
+              <a class="post-tags" href="/tags.html#nginx">nginx</a>
+            
+              <a class="post-tags" href="/tags.html#uwsgi">uwsgi</a>
+            
+              <a class="post-tags" href="/tags.html#docker">docker</a>
+            
+            </span>
+          
+        </div>
+
+        <hr>
+        <div class="post-content">
+          <!-- 数学公式 -->
+<script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript"></script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    tex2jax: {
+      skipTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
+      inlineMath: [['$','$']]
+    }
+  });
+</script>
+
+<p>tensorflow模型训练完以后，如何进行部署？很容易想到可以通过rest api提供接口的方式，使用flask+nginx+uwsgi很容易实现,为了部署方便，本文使用docker部署训练好的tensorflow模型。<!-- more -->)</p>
+
+<h2 id="1简介">1、简介</h2>
+
+<p>tensorflow model训练完后如何部署：1、使用tensorflow serving模式；2、使用flask  访问模型提供rest api方式</p>
+
+<h2 id="2部署">2、部署</h2>
+
+<p><a href="https://github.com/zgd716/fasttext_docker">代码</a></p>
+
+<p>-data    存放数据</p>
+
+<p>-vocabs  存放字典文件</p>
+
+<p>-runs    存放模型及tensorboard文件</p>
+
+<p>-data_helper.py   处理数据</p>
+
+<p>-config.py        配置文件</p>
+
+<p>-fast_text.py     FastText类</p>
+
+<p>-train.py         训练模型</p>
+
+<p>-predict.py       预测</p>
+
+<p>注意：train.py在训练模型的时候会生成vocabs文件夹，用来存储字典词字典、标签相关对象</p>
+
+<p>项目中的main.py是flask项目的入口</p>
+
+<p>为了使用docker部署，Dockerfile中使用joelogan/keras-tensorflow-flask-uwsgi-nginx-docker基础镜像</p>
+
+<p>直接使用docker  build -t fasttext-image .  生成镜像</p>
+
+<p>docker run -d –name fasttext-container -p 8989:80 fasttext-image  生成容器</p>
+
+<p><img src="/imgs/employment/tfmodel_flask_docker.jpg" /></p>
+
+
+        </div>
+        <br><br>
+      </article>
+
+      <nav class="post-pagination">
+        
+        <a href="/nlp/nlp-elmo.html" class="btn previous" title="Deep contextualized word representations(ELMO)">&larr; Deep contextualized word representations(ELMO)</a>
+        
+        
+        <a href="/nlp/nlp-transformer.html" class="btn next" title="transformer">transformer &rarr;</a>
+        
+      </nav>
+
+      <hr>
+
+      
+      <aside class="related">
+        <h3>Related Posts</h3>
+        <ul class="related-posts">
+          
+            <li>
+              <a href="/nlp/cluster.html">
+                聚类
+                <small><time datetime="2019-08-26T18:30:00+08:00">26 Aug 2019</time></small>
+              </a>
+            </li>
+          
+            <li>
+              <a href="/nlp/nlp-rasa.html">
+                rasa（task bot）
+                <small><time datetime="2019-08-20T18:30:00+08:00">20 Aug 2019</time></small>
+              </a>
+            </li>
+          
+            <li>
+              <a href="/nlp/nlp-bert.html">
+                bert
+                <small><time datetime="2019-02-28T18:30:00+08:00">28 Feb 2019</time></small>
+              </a>
+            </li>
+          
+        </ul>
+      </aside>
+      
+
+      <!-- Gitment -->
+<div id="container"></div>
+<link rel="stylesheet" href="https://imsun.github.io/gitment/style/default.css">
+<script src="https://imsun.github.io/gitment/dist/gitment.browser.js"></script>
+<script>
+var gitment = new Gitment({
+  id: '页面 ID', // 可选。默认为 location.href
+  owner: 'zgd716',
+  repo: 'zgd716.github.io',
+  oauth: {
+    client_id: 'f2929ac3ac85d885f3ac',
+    client_secret: 'bed8d991d79eb65d3d4d5437eecd2af1ea6b1fd9',
+  },
+})
+gitment.render('container')
+</script>
+    </div>
+    
+    <div class="col-md-3 post-sidebar">
+      <div class="sidebar-content" id="sidebar">
+  <nav class="header-list-sidebar">
+    <ul id="sideNav" class="nav headers-sidenav">
+        <!-- code will be generated in TOC.js -->
+    </ul>
+  </nav>
+</div>
+    </div>
+  </div>
+</div>
+
+
+     
+
+<div class="cb-search-tool" style="position: fixed; top: 0px ; bottom: 0px; left: 0px; right:  0px;
+      opacity: 0.95; background-color: #111111; z-index: 9999; display: none;">
+    <input type="text" class="form-control cb-search-content" id="cb-search-content" style="position: fixed; top: 60px" placeholder="文章标题 日期 标签" >
+
+    <div style="position: fixed; top: 16px; right: 16px;">
+        <img src="/search/img/cb-close.png"  id="cb-close-btn"/>
+    </div>
+</div>
+
+<div style="position: fixed; right: 16px; bottom: 70px;">
+    <img src="/search/img/cb-search.png"  id="cb-search-btn"  title="双击ctrl试一下"/>
+</div>
+
+<link rel="stylesheet" href="/search/css/cb-search.css">
+
+<script src="/search/js/bootstrap3-typeahead.min.js"></script>
+<script src="/search/js/cb-search.js"></script>
+
+
+    <a href="#top" class="back-to-top">^</a>
+
+<!--      -->
+
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="/assets/bootstrap-3.3.7-dist/js/bootstrap.min.js"></script>
+    <!-- TOC -->
+    <script src="/assets/js/toc/TOC.js"></script>
+
+    <script>$("#search-form").submit(function(event){
+      var query = document.getElementById("search-input").value;
+      window.open("https://google.com/search?q="+query+"%20site:" + "zgd716.github.io");
+    });</script>
+  </body>
+</html>

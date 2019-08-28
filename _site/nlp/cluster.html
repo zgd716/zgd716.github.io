@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <script src="/assets/js/jquery-1.12.4.min.js"></script>
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+  <title>
+    
+      聚类 &middot; 虚无-jellyzhang
+    
+  </title>
+
+  <!-- Bootstrap -->
+  <link rel="stylesheet" href="/assets/bootstrap-3.3.7-dist/css/bootstrap.min.css">
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="/assets/font-awesome/css/font-awesome.min.css">
+  <!-- My CSS -->
+  <link rel="stylesheet" href="/assets/main.css">
+
+  <!-- MathJax -->
+  <script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      TeX: {
+        equationNumbers: {
+          autoNumber: "AMS"
+        }
+      },
+      tex2jax: {
+        inlineMath: [ ['$','$'] ],
+        displayMath: [ ['$$','$$'] ],
+        processEscapes: true,
+      }
+    });
+  </script>
+  
+
+  <!-- code highlighting-->
+  <link rel="stylesheet" href="/lib/highlight/styles/hybrid.css">
+  <script src="/lib/highlight/highlight.pack.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script>
+  <script>hljs.configure({ ignore: ['text'] });</script>
+  
+  <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+  <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+  <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+    <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+  <![endif]-->
+</head>
+
+<body>
+    <header class="header">
+  <!-- Navigation -->
+  <nav class="navbar navbar-default .navbar-static-top">
+    <div class="container">
+      <!-- Brand and toggle get grouped for better mobile display -->
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+          <span class="sr-only">Toggle navigation</span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="/" style="color:#333">虚无-jellyzhang</a>
+        <p class="navbar-text"></p>
+      </div>
+
+      <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+        <ul class="nav navbar-nav navbar-right">
+        
+          <li>
+            <a href="/archives.html">归档</a>
+          </li>
+          <li>
+            <a href="/categories.html">分类</a>
+          </li>
+          <li>
+            <a href="/tags.html">标签</a>
+          </li>
+          <li>
+            <a href="/about.html">关于</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+</header>
+
+  
+    <div class="container">
+  <div class="row-fluid main">
+    <div class="col-md-9 content">
+      <article class="post">
+        <h1 class="post-title">聚类</h1>
+
+        <div class="post-info">
+          <span class="post-date">26 Aug 2019</span>
+           | 
+            <span class="fa fa-folder-open" aria-hidden="true">
+            
+              <a class="post-categories" href="/categories.html#nlp">nlp</a>
+            
+            </span>
+          
+           | 
+            <span class="fa fa-tag" aria-hidden="true">
+            
+              <a class="post-tags" href="/tags.html#nlp">nlp</a>
+            
+              <a class="post-tags" href="/tags.html#cluster">cluster</a>
+            
+            </span>
+          
+        </div>
+
+        <hr>
+        <div class="post-content">
+          <!-- 数学公式 -->
+<script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript"></script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    tex2jax: {
+      skipTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
+      inlineMath: [['$','$']]
+    }
+  });
+</script>
+
+<p>BERT（Bidirectional Encoder Representations from Transformers）近期提出之后，作为一个Word2Vec的替代者，其在NLP领域的11个方向大幅刷新了精度，可以说是近年来自残差网络最优突破性的一项技术了。论文的主要特点以下几点：</p>
+
+<p>使用了Transformer作为算法的主要框架，Transformer能更彻底的捕捉语句中的双向关系；</p>
+
+<p>使用了Mask Language Model(MLM)和 Next Sentence Prediction(NSP) 的多任务训练目标；</p>
+
+<p>使用更强大的机器训练更大规模的数据，使BERT的结果达到了全新的高度，并且Google开源了BERT模型，用户可以直接使用BERT作为Word2Vec的转换矩阵并高效的将其应用到自己的任务中。</p>
+
+<p>BERT的本质上是通过在海量的语料的基础上运行自监督学习方法为单词学习一个好的特征表示，所谓自监督学习是指在没有人工标注的数据上运行的监督学习。在以后特定的NLP任务中，我们可以直接使用BERT的特征表示作为该任务的词嵌入特征。所以BERT提供的是一个供其它任务迁移学习的模型，该模型可以根据任务微调或者固定之后作为特征提取器。BERT的源码和模型10月31号已经在Github上开源，简体中文和多语言模型也于11月3号开源。。<!-- more -->)</p>
+
+<h2 id="语言模型简介">语言模型简介</h2>
+
+<h3 id="文本表征">文本表征</h3>
+
+<p>文本表征是的 “数字形式 ”表达：</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>模型的运算需要数字
+
+模型的运算是连续的
+
+     对于𝑥, 𝑦 ∈ (0, 1)，我们总可以找到介于x与y之间的值；
+
+自然语言是离散的
+    
+     对于𝑣 ∈ {开心， 很开心， 非常开心}，我们无法定义任意两个词之间的词；
+
+文本表征
+
+      one-hot, tf-idf…
+
+      word2vec, doc2vec, glove, fastext…
+
+      ELMo, GPT, BERT
+</code></pre></div></div>
+
+<p><strong>词向量</strong></p>
+
+<p>分布式假设</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>相同上下文语境的词有相似的含义
+</code></pre></div></div>
+
+<p>词向量的弊端</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>每个词一个固定表征
+</code></pre></div></div>
+
+<p>结合上下文的动态表征</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>ELMo, GPT, BERT等基于语言模型的表征
+</code></pre></div></div>
+
+<p><img src="/imgs/bert/1.jpg" /></p>
+
+<h3 id="语言模型">语言模型</h3>
+
+<p><strong>语言模型是什么</strong></p>
+
+<p>语言模型本质上是概率模型</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>在给定前文的基础上，从概率上预测接下来的内容
+
+它的目标就是学会语言的“套路”
+
+随着前文越详细，预测的目标越明确
+</code></pre></div></div>
+
+<p><strong>传统语言模型的问题</strong></p>
+
+<p><img src="/imgs/bert/2.jpg" /></p>
+
+<p><img src="/imgs/bert/3.jpg" /></p>
+
+<p>N元语言模型</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>过于短程的依赖
+</code></pre></div></div>
+
+<p><img src="/imgs/bert/4.jpg" /></p>
+
+<p>解决长程依赖的途径</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>RNN+LSTM,GRU
+
+Attention
+</code></pre></div></div>
+
+<p><img src="/imgs/bert/5.jpg" /></p>
+
+<p><img src="/imgs/bert/6.jpg" /></p>
+
+<h3 id="深度学习与语言模型">深度学习与语言模型</h3>
+
+<p><strong>神经网络语言模型</strong></p>
+
+<p>如：人们彼此的交往离不开语言</p>
+
+<p>单向RNN：</p>
+
+<p><img src="/imgs/bert/7.jpg" /></p>
+
+<p>双向RNN：</p>
+
+<p><img src="/imgs/bert/8.jpg" /></p>
+
+<p>单向Attention：</p>
+
+<p><img src="/imgs/bert/9.jpg" /></p>
+
+<p><strong>双向编码与网络深度的冲突</strong></p>
+
+<p>加深网络的层数可以带来更好的效果</p>
+
+<p><img src="/imgs/bert/10.jpg" /></p>
+
+<p>深度的增加导致标签信息泄露</p>
+
+<p><img src="/imgs/bert/11.jpg" /></p>
+
+<p>解决方式</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>多层单向Rnn，独立建模(ELMo)
+</code></pre></div></div>
+
+<p><img src="/imgs/bert/12.jpg" /></p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Mask LM (BERT)
+</code></pre></div></div>
+
+<p><img src="/imgs/bert/13.jpg" /></p>
+
+<p><strong>深度学习的模型可以从文本中学到什么？</strong></p>
+
+<p>根据不同的语料以及任务，深度学习模型可以从数据中学到不同的内容：</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  通用文本：句法结构、pos、词共现，层级关系等。
+
+      (Blevins et al., ACL 2018; Zhang &amp; Bowman, 2018) 
+      
+      (Peters et al., NAACL 2018; EMNLP 2018) 
+
+  诗句：格律、节奏
+
+      (Lau et al., ACL 2018) 
+
+  结构化文本：格式、规则
+  
+      (Yin and Neubig, ACL 2017)
+</code></pre></div></div>
+
+<h2 id="bert解析">BERT解析</h2>
+
+<h3 id="bert的基本结构">bert的基本结构</h3>
+
+<p>Embedding</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Word embedding
+
+Position embedding
+
+Type embedding
+</code></pre></div></div>
+
+<p><img src="/imgs/bert/14.jpg" /></p>
+
+<p>Transformer Encoder</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Multi-Head Attention
+
+Feed Forward
+</code></pre></div></div>
+
+<p><img src="/imgs/bert/15.jpg" /></p>
+
+<p>Losses</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Mask LM
+
+ Next sentence prediction
+</code></pre></div></div>
+
+<p><img src="/imgs/bert/16.jpg" width="750px" height="400" /></p>
+
+<p><img src="/imgs/bert/17.jpg" width="750px" height="400" /></p>
+
+<p><img src="/imgs/bert/18.jpg" width="750px" height="400" /></p>
+
+<h3 id="模型模块详解">模型模块详解</h3>
+
+<p><img src="/imgs/bert/19.jpg" /></p>
+
+<p>文本分类任务</p>
+
+<p><img src="/imgs/bert/20.jpg" /></p>
+
+<p>QA任务</p>
+
+<p><img src="/imgs/bert/21.jpg" /></p>
+
+<p>文本Tagging任务</p>
+
+<p><img src="/imgs/bert/22.jpg" /></p>
+
+<h3 id="一些细节">一些细节</h3>
+
+<p>预训练数据的构建</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>输入的两个部分都是包含完整句子
+
+同一句中不会同时Mask同一个词
+
+非连续的句子都是取自不同文档
+
+有一定的概率让输入的有效文本长度小于输入全长（利用padding补齐）
+
+对于超过全长的文本，随机从第一部分部分和第二部分部分的头和尾削减
+</code></pre></div></div>
+
+<p>模型</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Encoder LM任务的输出后经过一个gelu非线性层再进行LM Loss的计算；
+
+Classify任务的输出后经过一个tanh非线性层再进行的二分类
+</code></pre></div></div>
+
+<h2 id="应用">应用</h2>
+
+<h3 id="如何使用预训练模型">如何使用预训练模型</h3>
+
+<p><img src="/imgs/bert/23.jpg" /></p>
+
+<h3 id="实验心得">实验心得</h3>
+
+<p><img src="/imgs/bert/24.jpg" /></p>
+
+<p><img src="/imgs/bert/25.jpg" /></p>
+
+<p><img src="/imgs/bert/26.jpg" /></p>
+
+
+        </div>
+        <br><br>
+      </article>
+
+      <nav class="post-pagination">
+        
+        <a href="/nlp/nlp-rasa.html" class="btn previous" title="rasa（task bot）">&larr; rasa（task bot）</a>
+        
+        
+      </nav>
+
+      <hr>
+
+      
+      <aside class="related">
+        <h3>Related Posts</h3>
+        <ul class="related-posts">
+          
+            <li>
+              <a href="/nlp/nlp-rasa.html">
+                rasa（task bot）
+                <small><time datetime="2019-08-20T18:30:00+08:00">20 Aug 2019</time></small>
+              </a>
+            </li>
+          
+            <li>
+              <a href="/nlp/nlp-bert.html">
+                bert
+                <small><time datetime="2019-02-28T18:30:00+08:00">28 Feb 2019</time></small>
+              </a>
+            </li>
+          
+            <li>
+              <a href="/nlp/nlp-transformer.html">
+                transformer
+                <small><time datetime="2019-02-12T18:30:00+08:00">12 Feb 2019</time></small>
+              </a>
+            </li>
+          
+        </ul>
+      </aside>
+      
+
+      <!-- Gitment -->
+<div id="container"></div>
+<link rel="stylesheet" href="https://imsun.github.io/gitment/style/default.css">
+<script src="https://imsun.github.io/gitment/dist/gitment.browser.js"></script>
+<script>
+var gitment = new Gitment({
+  id: '页面 ID', // 可选。默认为 location.href
+  owner: 'zgd716',
+  repo: 'zgd716.github.io',
+  oauth: {
+    client_id: 'f2929ac3ac85d885f3ac',
+    client_secret: 'bed8d991d79eb65d3d4d5437eecd2af1ea6b1fd9',
+  },
+})
+gitment.render('container')
+</script>
+    </div>
+    
+    <div class="col-md-3 post-sidebar">
+      <div class="sidebar-content" id="sidebar">
+  <nav class="header-list-sidebar">
+    <ul id="sideNav" class="nav headers-sidenav">
+        <!-- code will be generated in TOC.js -->
+    </ul>
+  </nav>
+</div>
+    </div>
+  </div>
+</div>
+
+
+     
+
+<div class="cb-search-tool" style="position: fixed; top: 0px ; bottom: 0px; left: 0px; right:  0px;
+      opacity: 0.95; background-color: #111111; z-index: 9999; display: none;">
+    <input type="text" class="form-control cb-search-content" id="cb-search-content" style="position: fixed; top: 60px" placeholder="文章标题 日期 标签" >
+
+    <div style="position: fixed; top: 16px; right: 16px;">
+        <img src="/search/img/cb-close.png"  id="cb-close-btn"/>
+    </div>
+</div>
+
+<div style="position: fixed; right: 16px; bottom: 70px;">
+    <img src="/search/img/cb-search.png"  id="cb-search-btn"  title="双击ctrl试一下"/>
+</div>
+
+<link rel="stylesheet" href="/search/css/cb-search.css">
+
+<script src="/search/js/bootstrap3-typeahead.min.js"></script>
+<script src="/search/js/cb-search.js"></script>
+
+
+    <a href="#top" class="back-to-top">^</a>
+
+<!--      -->
+
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="/assets/bootstrap-3.3.7-dist/js/bootstrap.min.js"></script>
+    <!-- TOC -->
+    <script src="/assets/js/toc/TOC.js"></script>
+
+    <script>$("#search-form").submit(function(event){
+      var query = document.getElementById("search-input").value;
+      window.open("https://google.com/search?q="+query+"%20site:" + "zgd716.github.io");
+    });</script>
+  </body>
+</html>
