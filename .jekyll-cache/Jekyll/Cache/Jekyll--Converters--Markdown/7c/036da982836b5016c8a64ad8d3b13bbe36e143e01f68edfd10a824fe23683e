@@ -1,0 +1,14 @@
+I"�<!-- 数学公式 -->
+<script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript"></script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    tex2jax: {
+      skipTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
+      inlineMath: [['$','$']]
+    }
+  });
+</script>
+
+<p>Facebook FAIR实验室在2016年宣布将开源资料库fastText，声称相比深度模型，fastText能将训练时间由数天缩短到几秒钟。fastText简而言之的本质，就是把文档中所有词通过lookup table变成向量，取平均后直接用线性分类器得到分类结果。</p>
+:ET

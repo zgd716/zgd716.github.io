@@ -1,0 +1,14 @@
+I"�<!-- 数学公式 -->
+<script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript"></script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    tex2jax: {
+      skipTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
+      inlineMath: [['$','$']]
+    }
+  });
+</script>
+
+<p>自从 AlphaGo 出现以来，机器学习无疑是当今最火热的话题，而深度学习也成了机器学习领域内的热点，现在人工智能、大数据更是越来越贴近我们的日常生活，越来越多的人工智能应用开始在移植到移动端上，那能够快速高效地在移动端部署深度学习模型就变成亟待解决的问题了。</p>
+:ET
