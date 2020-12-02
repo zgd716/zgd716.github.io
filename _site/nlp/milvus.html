@@ -8,7 +8,7 @@
   <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
   <title>
     
-      rasa（task bot） &middot; 虚无-jellyzhang
+      milvus+以图搜图 &middot; 虚无-jellyzhang
     
   </title>
 
@@ -93,10 +93,10 @@
   <div class="row-fluid main">
     <div class="col-md-9 content">
       <article class="post">
-        <h1 class="post-title">rasa（task bot）</h1>
+        <h1 class="post-title">milvus+以图搜图</h1>
 
         <div class="post-info">
-          <span class="post-date">20 Aug 2019</span>
+          <span class="post-date">01 Dec 2020</span>
            | 
             <span class="fa fa-folder-open" aria-hidden="true">
             
@@ -109,7 +109,11 @@
             
               <a class="post-tags" href="/tags.html#nlp">nlp</a>
             
-              <a class="post-tags" href="/tags.html#rasa">rasa</a>
+              <a class="post-tags" href="/tags.html#milvus">milvus</a>
+            
+              <a class="post-tags" href="/tags.html#cv">cv</a>
+            
+              <a class="post-tags" href="/tags.html#dl">dl</a>
             
             </span>
           
@@ -129,69 +133,72 @@
   });
 </script>
 
-<p>所谓对话系统，是通过对话的方式，实现人机交互的一种方法。</p>
+<p>Milvus 能够帮助用户轻松应对海量非结构化数据（图片/视频/语音/文本）检索。单节点 Milvus 可以在秒内完成十亿级的向量搜索，分布式架构亦能满足用户的水平扩展需求。<!-- more --></p>
 
-<p>Rasa是一家通过机器学习技术实现对话系统、机器人开发的工具，同时也是一家创业公司。<!-- more --></p>
+<h3 id="在-ubuntucentos-上使用docker安装-milvus">在 Ubuntu/CentOS 上使用docker安装 Milvus</h3>
 
-<h2 id="rasa的组成">Rasa的组成</h2>
+<p>1.docker info,确定docker已经安装</p>
 
-<h3 id="rasa-nlu">Rasa NLU</h3>
+<p>2.拉取 Milvus 镜像(拉取仅需 CPU 的镜像)</p>
 
-<p>主要实现自然语言理解（即NLU）功能，本质上就是识别句子的意图和实体。</p>
-
-<p>如“买一张去北京的票”，我们可以定义一个意图是“购票”，实体是“北京”和“一张”。</p>
-
-<p>意图识别本质是短文本分类任务（当然在学术界可能称为Intent Detection来和Text Classification分开）。单纯短文本分类任务的SOTA基本上就是BERT了。</p>
-
-<p>抽取本质是信息抽取任务。抽取的SOTA现在一般还是BiLSTM-CRF的各种变型，或BERT之类。</p>
-
-<p>现在学术界的主要研究方向是多种工作结合，例如同一模型同时做意图识别和信息抽取，互相配合增加总体准确率。</p>
-
-<p>Rasa的NLU，主要是当前的社区版，主要还是使用了各种开源技术，并没有追求学术上的SOTA。它使用的工具包括Spacy、sklearn-crfsuite</p>
-
-<h3 id="rasa-core">Rasa Core</h3>
-
-<p>这是Rasa的核心部分，NLU有各种实现，开源的也有snips nlu等，但是core却独一无二。</p>
-
-<p>Rasa Core主要完成了基于故事的对话管理，包括解析故事并生成对话系统中的对话管理模型（Dialog Management），输出系统决策（System Action/System Policy）。</p>
-
-<p>学术上一般认为这部分会包含两个模型</p>
-
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>1、对话状态跟踪（Dialog State Tracking / Belief Tracking）
-
-2、对话策略（Dialog Policy / Policy Optimization）
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>docker pull milvusdb/milvus:0.9.1-cpu-d052920-e04ed5
 </code></pre></div></div>
 
-<p>对于1.其实Rasa实现很简单，具体在它的论文 Few-Shot Generalization Across Dialogue Tasks, Vlasov et at., 2018 中说的比较具体。就是简单的基于策略的槽状态替换。</p>
+<p>3.下载配置文件</p>
 
-<p>对于2.Rasa使用基于LSTM的Learn to Rank方法，大体上是将当前轮用户意图、上一轮系统行为、当前槽值状态向量化，然后与所有系统行为做相似度学习，以此决定当前轮次的一个或多个系统行为</p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>mkdir -p /home/$USER/milvus/conf
 
-<h3 id="rasa--的-pipeline">Rasa  的 Pipeline</h3>
+cd /home/$USER/milvus/conf
 
-<p>Pipeline 的过程是这样的：</p>
-
-<p><img src="../imgs/rasa/rasa-pipeline.jpg" width="650" /></p>
-
-<p>1、用户输入文字，送入解释器，即Rasa NLU</p>
-
-<p>2、NLU给出结果，如图</p>
-
-<p><img src="../imgs/rasa/nlu.jpg" width="650" /></p>
-
-<p>3、从Tracker到Policy，Tracker用于跟踪对话状态，Tracker输出的是Embedding</p>
-
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>用户意图的Embedding
-
-系统动作（上一步）的Embedding
-
-实体（槽值/Slot）的Embedding
+wget https://raw.githubusercontent.com/milvus-io/milvus/v0.9.1/core/conf/demo/server_config.yaml
 </code></pre></div></div>
 
-<p>4、Policy给出系统行为</p>
+<p>注意：万一你遇到无法通过 wget 命令正常下载配置文件的情况，你也可以在 /home/$USER/milvus/conf 路径下创建 server_config.yaml 文件，然后复制粘贴 server config 文件 的内容。</p>
 
-<p>5、Tracker记录系统行为，下一次会提供给Policy使用</p>
+<p>4.启动 Milvus Docker 容器</p>
 
-<p>6、返回消息给用户</p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>sudo docker run -d --name milvus_cpu_0.9.1 \
+-p 19530:19530 \
+-p 19121:19121 \
+-v /home/$USER/milvus/db:/var/lib/milvus/db \
+-v /home/$USER/milvus/conf:/var/lib/milvus/conf \
+-v /home/$USER/milvus/logs:/var/lib/milvus/logs \
+-v /home/$USER/milvus/wal:/var/lib/milvus/wal \
+milvusdb/milvus:0.9.1-cpu-d052920-e04ed5
+</code></pre></div></div>
+
+<h3 id="使用milvus实现以图搜图">使用Milvus实现以图搜图</h3>
+
+<p>项目代码:<a href="https://github.com/zgd716/search_image">https://github.com/zgd716/search_image</a></p>
+
+<p>项目运行流程:</p>
+
+<p><img src="/imgs/milvus/1.png" /></p>
+
+<p>一、图片预处理：</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>准备搜索的图片库
+
+提取图片库全部图片的特征值
+
+将特征值存入milvus和图片地址持久化(存入数据库)
+</code></pre></div></div>
+
+<p>二、用户上传图片：</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>将图片保存服务器
+
+提取该图片的特征值
+
+运用欧式距离算法与图片库特征值，进行相似度计算，展示相似度最高的top k 张图片
+</code></pre></div></div>
+
+<p>前置条件环境配置完毕、milvus安装完毕且开启。</p>
+
+<p>1.python ImageTrain.py，提取特征,存放到milvus中</p>
+
+<p>2.运行manage.py,测试以图搜图功能</p>
+
 
         </div>
         <br><br>
@@ -199,10 +206,8 @@
 
       <nav class="post-pagination">
         
-        <a href="/nlp/nlp-bert.html" class="btn previous" title="bert">&larr; bert</a>
+        <a href="/deployment/cluster.html" class="btn previous" title="app使用深度学习">&larr; app使用深度学习</a>
         
-        
-        <a href="/deployment/cluster.html" class="btn next" title="app使用深度学习">app使用深度学习 &rarr;</a>
         
       </nav>
 
@@ -214,16 +219,16 @@
         <ul class="related-posts">
           
             <li>
-              <a href="/nlp/milvus.html">
-                milvus+以图搜图
-                <small><time datetime="2020-12-01T18:30:00+08:00">01 Dec 2020</time></small>
+              <a href="/deployment/cluster.html">
+                app使用深度学习
+                <small><time datetime="2019-11-26T18:30:00+08:00">26 Nov 2019</time></small>
               </a>
             </li>
           
             <li>
-              <a href="/deployment/cluster.html">
-                app使用深度学习
-                <small><time datetime="2019-11-26T18:30:00+08:00">26 Nov 2019</time></small>
+              <a href="/nlp/nlp-rasa.html">
+                rasa（task bot）
+                <small><time datetime="2019-08-20T18:30:00+08:00">20 Aug 2019</time></small>
               </a>
             </li>
           

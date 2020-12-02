@@ -3,6 +3,14 @@
 	"data" : [
 	 
 	{
+		"title" : "milvus+以图搜图 - nlp_milvus_cv_dl",
+		"url" : "/nlp/milvus.html"
+	}
+	
+	,
+	
+    
+	{
 		"title" : "app使用深度学习 - deployment_dl",
 		"url" : "/deployment/cluster.html"
 	}
